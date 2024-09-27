@@ -6,22 +6,46 @@ from enum import Enum
 GAME_TITLE = "Robot Game"
 WINDOW_WIDTH = 640
 WINDOW_HEIGHT = 480
+WORLD_WIDTH = 64
+WORLD_HEIGHT = 48
+TILE_SIZE = 16
 FPS = 60
 
 
 class GameApplication:
     def __init__(self) -> None:
         pygame.init()
-        self.window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+        self.window_width = WORLD_WIDTH * TILE_SIZE
+        self.window_height = WORLD_HEIGHT * TILE_SIZE
+        self.window = pygame.display.set_mode((self.window_width, self.window_height))
+
         pygame.display.set_caption(GAME_TITLE)
         self.clock = pygame.time.Clock()
+
+        self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
+
         self.run()
 
     def update(self) -> None:
         self.handle_events()
 
     def render(self) -> None:
-        pass
+
+        self.window.fill((0, 0, 0))  # clear window with solid color
+        self.render_world()
+        pygame.display.flip()
+
+    def render_world(self) -> None:
+        for i in range(self.world.width):
+            for j in range(self.world.height):
+                tile = self.world.get_tile_at_position(i, j)
+                top_x = i * TILE_SIZE
+                top_y = j * TILE_SIZE
+                bototm_x = top_x + TILE_SIZE
+                bototm_y = top_y + TILE_SIZE
+                pygame.draw.rect(
+                    self.window, tile.color, (top_x, top_y, bototm_x, bototm_y)
+                )
 
     def handle_events(self) -> None:
         for event in pygame.event.get():
