@@ -114,5 +114,39 @@ class Tile(Enum):
         obj.is_collidable = is_collidable
         return obj
 
+
+class Camera:
+    """
+    A class which represents a camera of a given width and height. It keeps
+    track of the position of the camera in the world, and is used to aid in
+    rendering the world to the screen.
+    """
+
+    def __init__(
+        self,
+        width: int,
+        height: int,
+        world: World,
+        tile_size: int,
+        pos_x: int = 0,
+        pos_y: int = 0,
+    ) -> None:
+
+        self._width = width
+        self._height = height
+        self._world = world
+        self._tile_size = tile_size
+
+    @property
+    def width(self):
+        """The width property."""
+        return self._width
+
+    @property
+    def height(self):
+        """The height property."""
+        return self._height
+
+
 if __name__ == "__main__":
     game = GameApplication()
