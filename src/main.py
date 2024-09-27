@@ -81,6 +81,11 @@ class World:
         return tile_grid
 
     def get_tile_at_position(self, x: int, y: int) -> Tile:
+        
+        # Check if the position is out of bounds. If so, return a bounds tile.
+        if x < 0 or x >= self._width or y < 0 or y >= self._height:
+            return Tile.BOUNDS
+        
         return Tile(self._tile_grid[x][y])
 
     def set_tile_at_position(self, x: int, y: int, tile: Tile) -> None:
@@ -106,6 +111,9 @@ class Tile(Enum):
 
     FLOOR = (0, (120, 120, 120), False)
     WALL = (1, (160, 160, 160), True)
+    
+    # The bounds tile represents a tile that is outside the bounds of a world
+    BOUNDS = (-1, (255, 0, 0), True) 
 
     def __new__(cls, tile_id, color, is_collidable):
         obj = object.__new__(cls)
