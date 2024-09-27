@@ -51,7 +51,17 @@ class GameApplication:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-
+            if event.type == pygame.KEYDOWN:
+                match (event.key):
+                    case pygame.K_UP:
+                        self.camera.pos_y -= 1
+                    case pygame.K_DOWN:
+                        self.camera.pos_y += 1
+                    case pygame.K_LEFT:
+                        self.camera.pos_x -= 1
+                    case pygame.K_RIGHT:
+                        self.camera.pos_x += 1
+                        
     def run(self) -> None:
         while True:
             self.update()
