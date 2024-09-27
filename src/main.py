@@ -3,24 +3,37 @@ import pygame
 from random import random
 from enum import Enum
 
-GAME_TITLE = "Robot Game"
-WORLD_WIDTH = 64
-WORLD_HEIGHT = 48
-TILE_SIZE = 16
-FPS = 60
+GAME_TITLE = "Robot Game"  # the title for the game caption
+WORLD_WIDTH = 24  # the world width in tiles
+WORLD_HEIGHT = 24  # the world height in tiles
+CAMERA_WIDTH = 32  # the camera width in tiles
+CAMERA_HEIGHT = 32  # the camera height in tiles
+TILE_SIZE = 16  # tile size in pixels
+FPS = 60  # fps of the game
 
 
 class GameApplication:
     def __init__(self) -> None:
         pygame.init()
-        self.window_width = WORLD_WIDTH * TILE_SIZE
-        self.window_height = WORLD_HEIGHT * TILE_SIZE
+
+        # set the width and height of the window in pixels
+        self.window_width = CAMERA_WIDTH * TILE_SIZE
+        self.window_height = CAMERA_HEIGHT * TILE_SIZE
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
 
         pygame.display.set_caption(GAME_TITLE)
+
         self.clock = pygame.time.Clock()
 
         self.world = World(WORLD_WIDTH, WORLD_HEIGHT)
+        self.camera = Camera(
+            CAMERA_WIDTH,
+            CAMERA_HEIGHT,
+            self.world,
+            TILE_SIZE,
+            WORLD_WIDTH // 2 - CAMERA_WIDTH // 2, # center the camera on world
+            WORLD_HEIGHT // 2 - CAMERA_HEIGHT // 2, # center the camera on world
+        )
 
         self.run()
 
@@ -30,20 +43,8 @@ class GameApplication:
     def render(self) -> None:
 
         self.window.fill((0, 0, 0))  # clear window with solid color
-        self.render_world()
+        self.camera.render(self.window)
         pygame.display.flip()
-
-    def render_world(self) -> None:
-        for i in range(self.world.width):
-            for j in range(self.world.height):
-                tile = self.world.get_tile_at_position(i, j)
-                top_x = i * TILE_SIZE
-                top_y = j * TILE_SIZE
-                bototm_x = top_x + TILE_SIZE
-                bototm_y = top_y + TILE_SIZE
-                pygame.draw.rect(
-                    self.window, tile.color, (top_x, top_y, bototm_x, bototm_y)
-                )
 
     def handle_events(self) -> None:
         for event in pygame.event.get():
@@ -81,11 +82,11 @@ class World:
         return tile_grid
 
     def get_tile_at_position(self, x: int, y: int) -> Tile:
-        
+
         # Check if the position is out of bounds. If so, return a bounds tile.
         if x < 0 or x >= self._width or y < 0 or y >= self._height:
             return Tile.BOUNDS
-        
+
         return Tile(self._tile_grid[x][y])
 
     def set_tile_at_position(self, x: int, y: int, tile: Tile) -> None:
@@ -111,9 +112,9 @@ class Tile(Enum):
 
     FLOOR = (0, (120, 120, 120), False)
     WALL = (1, (160, 160, 160), True)
-    
+
     # The bounds tile represents a tile that is outside the bounds of a world
-    BOUNDS = (-1, (255, 0, 0), True) 
+    BOUNDS = (-1, (255, 0, 0), True)
 
     def __new__(cls, tile_id, color, is_collidable):
         obj = object.__new__(cls)
@@ -144,6 +145,23 @@ class Camera:
         self._height = height
         self._world = world
         self._tile_size = tile_size
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+
+    def render(self, surface: pygame.surface.Surface) -> None:
+        """
+        Renders the camera view to the given surface.
+        """
+        for i in range(0, self.width):
+            for j in range(0, self.height):
+                tile = self._world.get_tile_at_position(i + self.pos_x, j + self.pos_y)
+                top_x = i * self._tile_size
+                top_y = j * self._tile_size
+                bototm_x = top_x + self._tile_size
+                bototm_y = top_y + self._tile_size
+                pygame.draw.rect(
+                    surface, tile.color, (top_x, top_y, bototm_x, bototm_y)
+                )
 
     @property
     def width(self):
