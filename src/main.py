@@ -4,8 +4,6 @@ from random import random
 from enum import Enum
 
 GAME_TITLE = "Robot Game"
-WINDOW_WIDTH = 640
-WINDOW_HEIGHT = 480
 WORLD_WIDTH = 64
 WORLD_HEIGHT = 48
 TILE_SIZE = 16
@@ -115,7 +113,6 @@ class Tile(Enum):
         obj.color = color
         obj.is_collidable = is_collidable
         return obj
-
 
 if __name__ == "__main__":
     game = GameApplication()
