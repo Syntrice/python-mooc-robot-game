@@ -1,6 +1,6 @@
 import pygame
 from random import random
-from enum import enum
+from enum import Enum
 
 GAME_TITLE = "Robot Game"
 WINDOW_WIDTH = 640
@@ -52,10 +52,8 @@ class World:
         for i in range(self._width):
             tile_grid.append([])
             for j in range(self._height):
-                tile_grid[i].append(0 if random() < 0.5 else 1)
+                tile_grid[i].append(Tile.WALL.value if random() < 0.5 else Tile.FLOOR.value)
         return tile_grid
-
-        
 
     @property
     def width(self):
@@ -66,6 +64,23 @@ class World:
     def height(self):
         """The height property."""
         return self._height
+
+class Tile(Enum):
+    """
+    An enumeration representing the different types of tiles that can be
+    present in the game world. Each tile type has an ID, a color, and a flag
+    indicating whether the tile is collidable or not.
+    """
+    
+    FLOOR = (0, (120, 120, 120), False)
+    WALL = (1, (160, 160, 160), True)
+    
+    def __new__(cls, tile_id, color, is_collidable):
+        obj = object.__new__(cls)
+        obj._value_ = tile_id
+        obj.color = color
+        obj.is_collidable = is_collidable
+        return obj
 
 if __name__ == "__main__":
     game = GameApplication()
