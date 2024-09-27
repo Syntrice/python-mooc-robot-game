@@ -1,7 +1,7 @@
+from __future__ import annotations
 import pygame
 from random import random
 from enum import Enum
-from __future__ import annotations
 
 GAME_TITLE = "Robot Game"
 WINDOW_WIDTH = 640
