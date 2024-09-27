@@ -1,5 +1,6 @@
 import pygame
-import random
+from random import random
+from enum import enum
 
 GAME_TITLE = "Robot Game"
 WINDOW_WIDTH = 640
@@ -51,10 +52,11 @@ class World:
         for i in range(self._width):
             tile_grid.append([])
             for j in range(self._height):
-                tile_grid[i].append(0 if random.random() < 0.5 else 1)
+                tile_grid[i].append(0 if random() < 0.5 else 1)
         return tile_grid
+
         
-        
+
     @property
     def width(self):
         """The width property."""
@@ -64,8 +66,6 @@ class World:
     def height(self):
         """The height property."""
         return self._height
-
-
 
 if __name__ == "__main__":
     game = GameApplication()
