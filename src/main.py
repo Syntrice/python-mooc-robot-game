@@ -1,4 +1,5 @@
 import pygame
+import random
 
 GAME_TITLE = "Robot Game"
 WINDOW_WIDTH = 640
@@ -32,16 +33,27 @@ class GameApplication:
             self.render()
             self.clock.tick(FPS)
 
-
 class World:
     """
     A class representing a tile-based game world, on which to keep track of
-    tiles to render and update.
+    tiles to render and update. Tile types are currently defined using integer 
+    IDs.
     """
 
     def __init__(self, width: int, height: int) -> None:
         self._width = width
         self._height = height
+        self._tile_grid = self._generate_random_tiles()
+
+        
+    def _generate_random_tiles(self) -> None:
+        tile_grid = []
+        for i in range(self._width):
+            tile_grid.append([])
+            for j in range(self._height):
+                tile_grid[i].append(0 if random.random() < 0.5 else 1)
+        return tile_grid
+        
         
     @property
     def width(self):
@@ -53,7 +65,7 @@ class World:
         """The height property."""
         return self._height
 
-    
+
 
 if __name__ == "__main__":
     game = GameApplication()
