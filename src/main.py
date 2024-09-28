@@ -42,6 +42,7 @@ MAP = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 ]
 
+PLAYER_MOVE_EVENT = pygame.USEREVENT + 1
 
 class GameApplication:
     def __init__(self) -> None:
@@ -73,7 +74,7 @@ class GameApplication:
 
     def setup_entities(self) -> None:
         self.entities = []
-        self.player = ImageEntity(self.images[0], 6, 6)
+        self.player = Player(self.images[0], 6, 6)
         self.entities.append(self.player)
 
     def setup_events(self) -> None:
@@ -102,42 +103,59 @@ class GameApplication:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-
+            
             if event.type == pygame.KEYDOWN:
                 match (event.key):
                     case pygame.K_UP:
-                        self.player.y_vel = -1
-                        self.player.move(0, -1)
-                        pygame.time.set_timer(self.player_move_event, 250)
+                        if not self.player.is_moving():
+                            self.player.move_up = 1
+                            self.player.move(self.world)
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 1000 // self.player.speed)
+                        else:
+                            self.player.move_up = 1
                     case pygame.K_DOWN:
-                        self.player.y_vel = 1
-                        self.player.move(0, 1)
-                        pygame.time.set_timer(self.player_move_event, 250)
+                        if not self.player.is_moving():
+                            self.player.move_down = 1
+                            self.player.move(self.world)
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 1000 // self.player.speed)
+                        else:
+                            self.player.move_down = 1
                     case pygame.K_LEFT:
-                        self.player.x_vel = -1
-                        self.player.move(-1, 0)
-                        pygame.time.set_timer(self.player_move_event, 250)
+                        if not self.player.is_moving():
+                            self.player.move_left = 1
+                            self.player.move(self.world)
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 1000 // self.player.speed)
+                        else:
+                            self.player.move_left = 1
                     case pygame.K_RIGHT:
-                        self.player.x_vel = 1
-                        self.player.move(1, 0)
-                        pygame.time.set_timer(self.player_move_event, 250)
-
+                        if not self.player.is_moving():
+                            self.player.move_right = 1
+                            self.player.move(self.world)
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 1000 // self.player.speed)
+                        else:
+                            self.player.move_right = 1
+                        
             if event.type == pygame.KEYUP:
                 match (event.key):
                     case pygame.K_UP:
-                        self.player.y_vel = 0
+                        self.player.move_up = 0
+                        if not self.player.is_moving():
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 0)
                     case pygame.K_DOWN:
-                        self.player.y_vel = 0
+                        self.player.move_down = 0
+                        if not self.player.is_moving():
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 0)
                     case pygame.K_LEFT:
-                        self.player.x_vel = 0
+                        self.player.move_left = 0
+                        if not self.player.is_moving():
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 0)
                     case pygame.K_RIGHT:
-                        self.player.x_vel = 0
-
-            if event.type == self.player_move_event:
-                self.player.move(self.player.x_vel, self.player.y_vel)
-
-        if self.player.x_vel == 0 and self.player.y_vel == 0:
-            pygame.time.set_timer(self.player_move_event, 0)
+                        self.player.move_right = 0
+                        if not self.player.is_moving():
+                            pygame.time.set_timer(PLAYER_MOVE_EVENT, 0)
+                            
+            if event.type == PLAYER_MOVE_EVENT:
+                self.player.move(self.world)
 
     def run(self) -> None:
         while True:
@@ -294,13 +312,28 @@ class ImageEntity:
         self.image = image
         self.x_pos = x_pos
         self.y_pos = y_pos
-        self.x_vel = 0
-        self.y_vel = 0
 
-    def move(self, x: int, y: int) -> None:
-        self.x_pos += x
-        self.y_pos += y
-
+class Player(ImageEntity):
+    def __init__(self, image: pygame.Surface, x_pos: int, y_pos: int, speed = 4) -> None:
+        super().__init__(image, x_pos, y_pos)
+        self.move_up = 0
+        self.move_down = 0
+        self.move_left = 0
+        self.move_right = 0
+        self.speed = speed # speed in tiles per second
+        
+    def move(self, world: World):
+        new_x_pos = self.x_pos + self.move_right - self.move_left
+        new_y_pos = self.y_pos + self.move_down - self.move_up
+        
+        if not world.get_tile_at_position(self.y_pos, new_x_pos).is_collidable:
+            self.x_pos = new_x_pos
+            
+        if not world.get_tile_at_position(new_y_pos, self.x_pos).is_collidable:
+            self.y_pos = new_y_pos
+    
+    def is_moving(self):
+        return bool(self.move_up + self.move_down + self.move_left + self.move_right)
 
 if __name__ == "__main__":
     game = GameApplication()
