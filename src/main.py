@@ -2,6 +2,7 @@ from __future__ import annotations
 import pygame
 from random import random
 from enum import Enum
+import math
 
 GAME_TITLE = "Robot Game"  # the title for the game caption
 CAMERA_WIDTH = 7  # the camera width in tiles
@@ -73,14 +74,14 @@ class GameApplication:
 
         self.run()
 
-    def update(self) -> None:
+    def update(self, delta: float) -> None:
         self.handle_events()
         
         # center camera on player
         self.camera.pos_x = self.player.x_pos - self.camera.width // 2
         self.camera.pos_y = self.player.y_pos - self.camera.height // 2
 
-    def render(self) -> None:
+    def render(self, delta: float) -> None:
 
         self.window.fill((0, 0, 0))  # clear window with solid color
         self.camera.render(self.window)
@@ -101,19 +102,19 @@ class GameApplication:
             if event.type == pygame.KEYDOWN:
                 match (event.key):
                     case pygame.K_UP:
-                        self.player.y_pos -= 1
+                        self.player.y_pos += -1
                     case pygame.K_DOWN:
                         self.player.y_pos += 1
                     case pygame.K_LEFT:
-                        self.player.x_pos -= 1
+                        self.player.x_pos += -1
                     case pygame.K_RIGHT:
                         self.player.x_pos += 1
 
     def run(self) -> None:
         while True:
-            self.update()
-            self.render()
-            print(self.clock.tick(FPS))
+            delta = self.clock.tick(FPS)
+            self.update(delta)
+            self.render(delta)
 
 
 class World:
@@ -257,7 +258,6 @@ class ImageEntity:
         self.image = image
         self.x_pos = x_pos
         self.y_pos = y_pos
-
 
 if __name__ == "__main__":
     game = GameApplication()
