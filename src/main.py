@@ -4,8 +4,6 @@ from random import random
 from enum import Enum
 
 GAME_TITLE = "Robot Game"  # the title for the game caption
-WORLD_WIDTH = 24  # the world width in tiles
-WORLD_HEIGHT = 24  # the world height in tiles
 CAMERA_WIDTH = 7  # the camera width in tiles
 CAMERA_HEIGHT = 7  # the camera height in tiles
 TILE_SIZE = 86  # tile size in pixels
@@ -115,7 +113,7 @@ class GameApplication:
         while True:
             self.update()
             self.render()
-            self.clock.tick(FPS)
+            print(self.clock.tick(FPS))
 
 
 class World:
@@ -129,16 +127,6 @@ class World:
         self._width = len(tile_grid)
         self._height = len(tile_grid[0])
         self._tile_grid = tile_grid
-
-    def _generate_random_tiles(self) -> list[list[int]]:
-        tile_grid = []
-        for i in range(self._width):
-            tile_grid.append([])
-            for j in range(self._height):
-                tile_grid[i].append(
-                    Tile.WALL.value if random() < 0.5 else Tile.FLOOR.value
-                )
-        return tile_grid
 
     def get_tile_at_position(self, x: int, y: int) -> Tile:
 
