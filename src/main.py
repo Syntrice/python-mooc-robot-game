@@ -71,6 +71,9 @@ class GameApplication:
         self.monster = ImageEntity(self.monster_img, 4, 4)
         self.coin = ImageEntity(self.coin_img, 6, 4)
         self.door = ImageEntity(self.door_img, 4, 6)
+        
+        # setup events
+        self.player_move_event = pygame.USEREVENT + 1
 
         self.run()
 
@@ -99,17 +102,43 @@ class GameApplication:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+                
             if event.type == pygame.KEYDOWN:
                 match (event.key):
                     case pygame.K_UP:
-                        self.player.y_pos += -1
+                        self.player.y_vel = -1
+                        self.player.move(0, -1)
+                        pygame.time.set_timer(self.player_move_event, 250)
                     case pygame.K_DOWN:
-                        self.player.y_pos += 1
+                        self.player.y_vel = 1
+                        self.player.move(0, 1)
+                        pygame.time.set_timer(self.player_move_event, 250)
                     case pygame.K_LEFT:
-                        self.player.x_pos += -1
+                        self.player.x_vel = -1
+                        self.player.move(-1, 0)
+                        pygame.time.set_timer(self.player_move_event, 250)
                     case pygame.K_RIGHT:
-                        self.player.x_pos += 1
-
+                        self.player.x_vel = 1
+                        self.player.move(1, 0)
+                        pygame.time.set_timer(self.player_move_event, 250)
+                        
+            if event.type == pygame.KEYUP:
+                match (event.key):
+                    case pygame.K_UP:
+                        self.player.y_vel = 0
+                    case pygame.K_DOWN:
+                        self.player.y_vel = 0
+                    case pygame.K_LEFT:
+                        self.player.x_vel = 0
+                    case pygame.K_RIGHT:
+                        self.player.x_vel = 0
+                        
+            if event.type == self.player_move_event:
+                self.player.move(self.player.x_vel, self.player.y_vel)
+                
+        if self.player.x_vel == 0 and self.player.y_vel == 0:
+            pygame.time.set_timer(self.player_move_event, 0)
+            
     def run(self) -> None:
         while True:
             delta = self.clock.tick(FPS)
@@ -258,6 +287,12 @@ class ImageEntity:
         self.image = image
         self.x_pos = x_pos
         self.y_pos = y_pos
+        self.x_vel = 0
+        self.y_vel = 0
+        
+    def move(self, x: int, y: int) -> None:
+        self.x_pos += x
+        self.y_pos += y
 
 if __name__ == "__main__":
     game = GameApplication()
