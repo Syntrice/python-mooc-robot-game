@@ -4,6 +4,8 @@ import math
 from random import random
 from enum import enum
 
+# Constants
+
 GAME_TITLE = "Robot Game"  # the title for the game caption
 CAMERA_WIDTH = 7  # the camera width in tiles
 CAMERA_HEIGHT = 7  # the camera height in tiles
@@ -179,16 +181,16 @@ class World:
         self._tile_grid = tile_grid
         self._entities: list[ImageEntity] = []
 
-    def get_tile_at_position(self, x: int, y: int) -> Tile:
+    def get_tile_at_position(self, col: int, row: int) -> Tile:
 
         # Check if the position is out of bounds. If so, return a bounds tile.
-        if x < 0 or x >= self._width or y < 0 or y >= self._height:
+        if col < 0 or col >= self._width or row < 0 or row >= self._height:
             return Tile.BOUNDS
 
-        return Tile(self._tile_grid[x][y])
+        return Tile(self._tile_grid[col][row])
 
-    def set_tile_at_position(self, x: int, y: int, tile: Tile) -> None:
-        self._tile_grid[x][y] = tile.value
+    def set_tile_at_position(self, col: int, row: int, tile: Tile) -> None:
+        self._tile_grid[col][row] = tile.value
 
     @property
     def width(self):
@@ -316,7 +318,7 @@ class ImageEntity:
         self.x_pos = x_pos
         self.y_pos = y_pos
 
-class Player(ImageEntity):
+class Player():
     def __init__(self, image: pygame.Surface, x_pos: int, y_pos: int, speed = 4) -> None:
         super().__init__(image, x_pos, y_pos)
         self.move_up = 0
