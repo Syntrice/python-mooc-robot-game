@@ -46,55 +46,55 @@ MAP = [
 class GameApplication:
     def __init__(self) -> None:
         pygame.init()
-
-        # set the width and height of the window in pixels
-        self.window_width = CAMERA_WIDTH * TILE_SIZE
-        self.window_height = CAMERA_HEIGHT * TILE_SIZE
+        self.window_width = CAMERA_WIDTH * TILE_SIZE  # in pixels
+        self.window_height = CAMERA_HEIGHT * TILE_SIZE  # in pixels
         self.window = pygame.display.set_mode((self.window_width, self.window_height))
-
         pygame.display.set_caption(GAME_TITLE)
-
         self.clock = pygame.time.Clock()
-        
+
         # set world and camera
         self.world = World(MAP)
         self.camera = Camera(CAMERA_WIDTH, CAMERA_HEIGHT, self.world, TILE_SIZE)
 
-        # load images
-        self.robot_img = pygame.image.load("src/robot.png")
-        self.monster_img = pygame.image.load("src/monster.png")
-        self.door_img = pygame.image.load("src/door.png")
-        self.coin_img = pygame.image.load("src/coin.png")
+        # pre game setup
+        self.load_resources()
+        self.setup_entities()
+        self.setup_events()
 
-        # create entities
-        self.player = ImageEntity(self.robot_img, 6, 6)
-        self.monster = ImageEntity(self.monster_img, 4, 4)
-        self.coin = ImageEntity(self.coin_img, 6, 4)
-        self.door = ImageEntity(self.door_img, 4, 6)
-        
-        # setup events
-        self.player_move_event = pygame.USEREVENT + 1
-
+        # start game loop
         self.run()
+
+    def load_resources(self) -> None:
+        self.images = []
+        self.images.append(pygame.image.load("src/robot.png"))
+        self.images.append(pygame.image.load("src/monster.png"))
+        self.images.append(pygame.image.load("src/door.png"))
+        self.images.append(pygame.image.load("src/coin.png"))
+
+    def setup_entities(self) -> None:
+        self.entities = []
+        self.player = ImageEntity(self.images[0], 6, 6)
+        self.entities.append(self.player)
+
+    def setup_events(self) -> None:
+        self.player_move_event = pygame.USEREVENT + 1
 
     def update(self, delta: float) -> None:
         self.handle_events()
-        
+
         # center camera on player
-        self.camera.pos_x = self.player.x_pos - self.camera.width // 2
-        self.camera.pos_y = self.player.y_pos - self.camera.height // 2
+        self.camera.center_on_point(self.player.x_pos, self.player.y_pos)
 
     def render(self, delta: float) -> None:
 
         self.window.fill((0, 0, 0))  # clear window with solid color
-        self.camera.render(self.window)
-        
-        # render image entities
-        self.camera.render_image_entity(self.window, self.player)
-        self.camera.render_image_entity(self.window, self.monster)
-        self.camera.render_image_entity(self.window, self.coin)
-        self.camera.render_image_entity(self.window, self.door)
-        
+
+        self.camera.render_world(self.window)
+
+        # render entities
+        for entity in self.entities:
+            self.camera.render_image_entity(self.window, entity)
+
         pygame.display.flip()
 
     def handle_events(self) -> None:
@@ -102,7 +102,7 @@ class GameApplication:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-                
+
             if event.type == pygame.KEYDOWN:
                 match (event.key):
                     case pygame.K_UP:
@@ -121,7 +121,7 @@ class GameApplication:
                         self.player.x_vel = 1
                         self.player.move(1, 0)
                         pygame.time.set_timer(self.player_move_event, 250)
-                        
+
             if event.type == pygame.KEYUP:
                 match (event.key):
                     case pygame.K_UP:
@@ -132,13 +132,13 @@ class GameApplication:
                         self.player.x_vel = 0
                     case pygame.K_RIGHT:
                         self.player.x_vel = 0
-                        
+
             if event.type == self.player_move_event:
                 self.player.move(self.player.x_vel, self.player.y_vel)
-                
+
         if self.player.x_vel == 0 and self.player.y_vel == 0:
             pygame.time.set_timer(self.player_move_event, 0)
-            
+
     def run(self) -> None:
         while True:
             delta = self.clock.tick(FPS)
@@ -225,7 +225,7 @@ class Camera:
         self.pos_x = pos_x
         self.pos_y = pos_y
 
-    def render(self, surface: pygame.Surface) -> None:
+    def render_world(self, surface: pygame.Surface) -> None:
         """
         Renders the camera view to the given surface.
         """
@@ -262,6 +262,13 @@ class Camera:
 
         surface.blit(entity.image, (entity_x, entity_y))
 
+    def center_on_point(self, x: int, y: int) -> None:
+        """
+        Centers the camera on the given point.
+        """
+        self.pos_x = x - self.width // 2
+        self.pos_y = y - self.height // 2
+
     @property
     def width(self):
         """The width property."""
@@ -275,7 +282,7 @@ class Camera:
 
 class ImageEntity:
     """
-    A game entity that has an pygame.Surface image object associated with it.
+    A game entity that has an pygame. Surface image object associated with it.
     """
 
     def __init__(
@@ -289,10 +296,11 @@ class ImageEntity:
         self.y_pos = y_pos
         self.x_vel = 0
         self.y_vel = 0
-        
+
     def move(self, x: int, y: int) -> None:
         self.x_pos += x
         self.y_pos += y
+
 
 if __name__ == "__main__":
     game = GameApplication()
