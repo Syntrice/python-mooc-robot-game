@@ -1,7 +1,7 @@
 from __future__ import annotations
 import pygame
 import math
-from random import randint
+from random import randint, choice
 from enum import Enum
 
 # Constants
@@ -47,6 +47,7 @@ MAP = [
 ]
 
 PLAYER_MOVE_EVENT = pygame.USEREVENT + 1
+MONSTER_MOVE_EVENT = pygame.USEREVENT + 2
 
 class GameApplication:
     def __init__(self) -> None:
@@ -68,8 +69,7 @@ class GameApplication:
         self.world.add_monsters(self.images[1])
         self.player = Player(self.images[0], 6, 6)
         
-        self.setup_events()
-
+        pygame.time.set_timer(MONSTER_MOVE_EVENT, 1000)
         # start game loop
         self.run()
 
@@ -79,9 +79,6 @@ class GameApplication:
         self.images.append(pygame.image.load("src/monster.png"))
         self.images.append(pygame.image.load("src/door.png"))
         self.images.append(pygame.image.load("src/coin.png"))
-
-    def setup_events(self) -> None:
-        self.player_move_event = pygame.USEREVENT + 1
 
     def update(self, delta: float) -> None:
         self.handle_events()
@@ -159,6 +156,9 @@ class GameApplication:
                             
             if event.type == PLAYER_MOVE_EVENT:
                 self.player.move(self.world)
+                
+            if event.type == MONSTER_MOVE_EVENT:
+                self.world.move_monsters()
 
     def run(self) -> None:
         while True:
@@ -235,6 +235,41 @@ class World:
             
             self.monsters[(x, y)] = monster
             i += 1
+            
+    def move_monsters(self) -> None:
+        
+        new_monsters = {}
+        for monster in self._monsters.values():
+            direction = choice([(1,0),(-1,0),(0,1),(0,-1)])
+            new_x = monster.x_pos + direction[0]
+            new_y = monster.y_pos + direction[1]
+            
+            move = True
+            
+            if self.get_tile_at_position(new_x, new_y).is_collidable:
+                move = False
+            
+            if (new_x, new_y) in self._monsters.keys():
+                move = False
+            
+            if (new_x, new_y) in new_monsters.keys():
+                move = False
+            
+            if (new_x, new_y) in self._coins.keys():
+                move = False
+        
+            if move:
+                monster.x_pos = new_x
+                monster.y_pos = new_y
+                new_monsters[(new_x, new_y)] = monster
+            else: 
+                new_monsters[(monster.x_pos, monster.y_pos)] = monster
+            
+            
+            self._monsters = new_monsters
+                
+            
+        
 
     @property
     def width(self):
