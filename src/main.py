@@ -1,14 +1,15 @@
 from __future__ import annotations
 import pygame
-from random import random
-from enum import Enum
 import math
+from random import random
+from enum import enum
 
 GAME_TITLE = "Robot Game"  # the title for the game caption
 CAMERA_WIDTH = 7  # the camera width in tiles
 CAMERA_HEIGHT = 7  # the camera height in tiles
 TILE_SIZE = 86  # tile size in pixels
 FPS = 60  # fps of the game
+COIN_COUNT = 20 # number of coins on the screen
 
 MAP = [
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -76,6 +77,7 @@ class GameApplication:
         self.entities = []
         self.player = Player(self.images[0], 6, 6)
         self.entities.append(self.player)
+
 
     def setup_events(self) -> None:
         self.player_move_event = pygame.USEREVENT + 1
@@ -175,6 +177,7 @@ class World:
         self._width = len(tile_grid)
         self._height = len(tile_grid[0])
         self._tile_grid = tile_grid
+        self._entities: list[ImageEntity] = []
 
     def get_tile_at_position(self, x: int, y: int) -> Tile:
 
