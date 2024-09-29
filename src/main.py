@@ -100,7 +100,7 @@ class GameApplication:
         
         
         score_text = self.game_font.render(f"Coins collected: {self.coin_count} / {COIN_COUNT}", True, (255,255,255))
-        self.window.blit(score_text, (self.window_width - 225, 50))
+        self.window.blit(score_text, (self.window_width - 250, 65))
 
         pygame.display.flip()
         
@@ -233,7 +233,6 @@ class World:
             
             self.coins[(x, y)] = coin
             i += 1
-        print(sorted(self.coins.keys()))
         
     def add_monsters(self, monster_image: pygame.Surface) -> None:
         i = 0
