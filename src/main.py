@@ -1,6 +1,5 @@
 from __future__ import annotations
 import pygame
-import math
 from random import randint, choice
 from enum import Enum
 
@@ -11,7 +10,7 @@ CAMERA_WIDTH = 7  # the camera width in tiles
 CAMERA_HEIGHT = 7  # the camera height in tiles
 TILE_SIZE = 86  # tile size in pixels
 FPS = 60  # fps of the game
-COIN_COUNT = 100 # number of coins on the screen
+COIN_COUNT = 50 # number of coins on the screen
 MONSTER_COUNT = 20 # number of coins on the screen
 
 MAP = [
