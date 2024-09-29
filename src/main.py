@@ -99,10 +99,16 @@ class GameApplication:
         pygame.display.flip()
         
     def check_collisions(self):
-        coin_coordinates = list(self.world.coin_coordinates())
-        for coin_pos in coin_coordinates:
+        for coin_pos in self.world.coin_coordinates():
             if coin_pos[0] == self.player.x_pos and coin_pos[1] == self.player.y_pos:
                 self.world.remove_coin_at_position(coin_pos[0], coin_pos[1])
+                
+        for monster_pos in self.world.monster_coordinates():
+            if monster_pos[0] == self.player.x_pos and monster_pos[1] == self.player.y_pos:
+                pygame.quit()
+                exit()
+                
+        
 
     def handle_events(self) -> None:
         for event in pygame.event.get():
@@ -276,10 +282,10 @@ class World:
             self._monsters = new_monsters
             
     def monster_coordinates(self) -> list[tuple[int, int]]:
-        return self._monsters.keys()
+        return list(self._monsters.keys())
     
     def coin_coordinates(self) -> list[tuple[int, int]]:
-        return self._coins.keys()
+        return list(self._coins.keys())
     
     def remove_coin_at_position(self, x: int, y: int) -> None:
         if (x, y) in self._coins.keys():
