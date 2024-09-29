@@ -82,6 +82,7 @@ class GameApplication:
 
     def update(self, delta: float) -> None:
         self.handle_events()
+        self.check_collisions()
 
         # center camera on player
         self.camera.center_on_point(self.player.x_pos, self.player.y_pos)
@@ -94,9 +95,14 @@ class GameApplication:
         self.camera.render_world_entities(self.window)
     
         self.camera.render_image_entity(self.window, self.player)
-        
 
         pygame.display.flip()
+        
+    def check_collisions(self):
+        coin_coordinates = list(self.world.coin_coordinates())
+        for coin_pos in coin_coordinates:
+            if coin_pos[0] == self.player.x_pos and coin_pos[1] == self.player.y_pos:
+                self.world.remove_coin_at_position(coin_pos[0], coin_pos[1])
 
     def handle_events(self) -> None:
         for event in pygame.event.get():
@@ -159,12 +165,13 @@ class GameApplication:
                 
             if event.type == MONSTER_MOVE_EVENT:
                 self.world.move_monsters()
-
+    
     def run(self) -> None:
         while True:
             delta = self.clock.tick(FPS)
             self.update(delta)
             self.render(delta)
+            
 
 
 class World:
@@ -267,8 +274,18 @@ class World:
             
             
             self._monsters = new_monsters
-                
             
+    def monster_coordinates(self) -> list[tuple[int, int]]:
+        return self._monsters.keys()
+    
+    def coin_coordinates(self) -> list[tuple[int, int]]:
+        return self._coins.keys()
+    
+    def remove_coin_at_position(self, x: int, y: int) -> None:
+        if (x, y) in self._coins.keys():
+            self._coins.pop((x, y))
+                
+    
         
 
     @property
