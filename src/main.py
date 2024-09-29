@@ -85,6 +85,7 @@ class GameApplication:
     def update(self, delta: float) -> None:
         self.handle_events()
         self.check_collisions()
+        self.update_score()
 
         # center camera on player
         self.camera.center_on_point(self.player.x_pos, self.player.y_pos)
@@ -98,11 +99,16 @@ class GameApplication:
     
         self.camera.render_image_entity(self.window, self.player)
         
+        self.window.blit(self.score_text, (self.window_width - 250, 65))
         
-        score_text = self.game_font.render(f"Coins collected: {self.coin_count} / {COIN_COUNT}", True, (255,255,255))
-        self.window.blit(score_text, (self.window_width - 250, 65))
 
         pygame.display.flip()
+        
+    def update_score(self):
+        if self.coin_count >= COIN_COUNT:
+            self.score_text = self.game_font.render("You Win!", True, (255,255,255))
+        else:
+            self.score_text = self.game_font.render(f"Coins collected: {self.coin_count} / {COIN_COUNT}", True, (255,255,255))
         
     def check_collisions(self):
         for coin_pos in self.world.coin_coordinates():
