@@ -68,6 +68,7 @@ class GameApplication:
         self.world.place_coins(self.images[3])
         self.world.add_monsters(self.images[1])
         self.player = Player(self.images[0], 6, 6)
+        self.coin_count = 0
         
         pygame.time.set_timer(MONSTER_MOVE_EVENT, 1000)
         # start game loop
@@ -79,6 +80,7 @@ class GameApplication:
         self.images.append(pygame.image.load("src/monster.png"))
         self.images.append(pygame.image.load("src/door.png"))
         self.images.append(pygame.image.load("src/coin.png"))
+        self.game_font = pygame.font.SysFont("Arial", 24)
 
     def update(self, delta: float) -> None:
         self.handle_events()
@@ -95,6 +97,10 @@ class GameApplication:
         self.camera.render_world_entities(self.window)
     
         self.camera.render_image_entity(self.window, self.player)
+        
+        
+        score_text = self.game_font.render(f"Coins collected: {self.coin_count} / {COIN_COUNT}", True, (255,255,255))
+        self.window.blit(score_text, (self.window_width - 225, 50))
 
         pygame.display.flip()
         
@@ -102,6 +108,7 @@ class GameApplication:
         for coin_pos in self.world.coin_coordinates():
             if coin_pos[0] == self.player.x_pos and coin_pos[1] == self.player.y_pos:
                 self.world.remove_coin_at_position(coin_pos[0], coin_pos[1])
+                self.coin_count += 1
                 
         for monster_pos in self.world.monster_coordinates():
             if monster_pos[0] == self.player.x_pos and monster_pos[1] == self.player.y_pos:
