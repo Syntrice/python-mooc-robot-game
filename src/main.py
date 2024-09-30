@@ -84,10 +84,10 @@ class GameApplication:
 
     def load_resources(self) -> None:
         self.images = []
-        self.images.append(pygame.image.load("src/robot.png"))
-        self.images.append(pygame.image.load("src/monster.png"))
-        self.images.append(pygame.image.load("src/door.png"))
-        self.images.append(pygame.image.load("src/coin.png"))
+        self.images.append(pygame.image.load("robot.png"))
+        self.images.append(pygame.image.load("monster.png"))
+        self.images.append(pygame.image.load("door.png"))
+        self.images.append(pygame.image.load("coin.png"))
         self.game_font = pygame.font.SysFont("Arial", 24)
 
     def update(self, delta: float) -> None:
